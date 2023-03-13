@@ -162,11 +162,11 @@ vector< vector<float> > covMatrix(RVec<CbmStsTrack> tracks)
 }
 
 float determinant3x3( const std::array<std::array<float, 3>, 3>& matrix ){
-  auto x_0 = matix[0][0] * ( matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[2][1]  );
-  auto x_1 = matix[0][1] * ( matrix[1][0]*matrix[2][2] - matrix[1][2]*matrix[2][0]  );
-  auto x_2 = matix[0][2] * ( matrix[1][0]*matrix[2][1] - matrix[1][1]*matrix[2][0]  );
+  auto x_0 = matrix[0][0] * ( matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[2][1]  );
+  auto x_1 = matrix[0][1] * ( matrix[1][0]*matrix[2][2] - matrix[1][2]*matrix[2][0]  );
+  auto x_2 = matrix[0][2] * ( matrix[1][0]*matrix[2][1] - matrix[1][1]*matrix[2][0]  );
 
-  return x_0 - x_1 + x2;
+  return x_0 - x_1 + x_2;
 }
 
 std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::array<float, 3> coordinate ){
@@ -174,7 +174,7 @@ std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::arra
   // Ax = B
   // xi = detAi / detA
   std::array<std::array<float, 3>, 3> A;
-  A[0] = {1f, 1f, 1f };
+  A[0] = {1.0f, 1.0f, 1.0f };
   A[1] = { coordinate[0], coordinate[1], coordinate[2] };
   A[2] = { coordinate[0]*coordinate[0], coordinate[1]*coordinate[1], coordinate[2]*coordinate[2] };
 
