@@ -144,25 +144,7 @@ vector<XYZVector> recDca(const RVec<BmnGlobalTrack> tracks, const CbmVertex vtx)
 vector< vector<float> > covMatrix(const RVec<CbmStsTrack> tracks)
 {
   vector<vector<float>> covariance_matrix;
-  for (const auto& track : tracks) {
-    auto* par = track.GetParamFirst();
-    covariance_matrix.emplace_back();
-    for( int i=0; i<5; ++i ){
-      for( int j=0; j<=i; ++j ){
-        covariance_matrix.back().push_back( par->GetCovariance(i, j) );
-      }
-    }
-    // Lower triangle of the symmetric covariance matrix
-    // C[x, y, tx, ty, Qp]
-    // { c_00, c1[0..1], c2[0..2], ... c4[0..4] }
-  }
-  return covariance_matrix;
-}
-
-vector< vector<float> > covMatrix(const RVec<CbmStsTrack> tracks)
-{
-  vector<vector<float>> covariance_matrix;
-  for (const auto& track : tracks) {
+  for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
     covariance_matrix.emplace_back();
     for( int i=0; i<5; ++i ){
@@ -183,7 +165,7 @@ vector< vector<float> > magneticField(const vector<CbmStsTrack> tracks)
   CbmL1PFFitter fitter;
   fitter.CalculateFieldRegion(tracks, field_region);
   vector<vector<float>> magnetic_field;
-  for (const auto& field : field_region) {
+  for (auto& field : field_region) {
     magnetic_field.emplace_back();
 
     magnetic_field.back().push_back( field.cx0 );
@@ -210,7 +192,7 @@ vector< vector<float> > magneticField(const vector<CbmStsTrack> tracks)
 vector<XYZTVector> stsTrackPos(const RVec<CbmStsTrack> tracks)
 {
   vector<XYZTVector> pos;
-  for (const auto& track : tracks) {
+  for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
     pos.push_back( {par->GetX(), par->GetY(), par->GetZ()} );
   }
@@ -220,7 +202,7 @@ vector<XYZTVector> stsTrackPos(const RVec<CbmStsTrack> tracks)
 vector<fourVector> stsTrackMomentum(const RVec<CbmStsTrack> tracks)
 {
   vector<fourVector> momenta;
-  for (auto track:tracks) {
+  for (auto& track : tracks) {
     auto *par = track.GetParamFirst();
     TVector3 mom;
     par->Momentum(mom);
