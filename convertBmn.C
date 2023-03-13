@@ -141,7 +141,7 @@ vector<XYZVector> recDca(const RVec<BmnGlobalTrack> tracks, const CbmVertex vtx)
   return dca;
 }
 
-vector< vector<float> > covMatrix(const RVec<CbmStsTrack> tracks)
+vector< vector<float> > covMatrix(RVec<CbmStsTrack> tracks)
 {
   vector<vector<float>> covariance_matrix;
   for (auto& track : tracks) {
@@ -159,7 +159,7 @@ vector< vector<float> > covMatrix(const RVec<CbmStsTrack> tracks)
   return covariance_matrix;
 }
 
-vector< vector<float> > magneticField(const vector<CbmStsTrack> tracks)
+vector< vector<float> > magneticField(vector<CbmStsTrack> tracks)
 {
   std::vector<L1FieldRegion> field_region;
   CbmL1PFFitter fitter;
@@ -189,7 +189,7 @@ vector< vector<float> > magneticField(const vector<CbmStsTrack> tracks)
   return magnetic_field;
 }
 
-vector<XYZTVector> stsTrackPos(const RVec<CbmStsTrack> tracks)
+vector<XYZTVector> stsTrackPos(RVec<CbmStsTrack> tracks)
 {
   vector<XYZTVector> pos;
   for (auto& track : tracks) {
@@ -199,7 +199,7 @@ vector<XYZTVector> stsTrackPos(const RVec<CbmStsTrack> tracks)
   return pos;
 }
 
-vector<fourVector> stsTrackMomentum(const RVec<CbmStsTrack> tracks)
+vector<fourVector> stsTrackMomentum(RVec<CbmStsTrack> tracks)
 {
   vector<fourVector> momenta;
   for (auto& track : tracks) {
