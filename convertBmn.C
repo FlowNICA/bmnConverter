@@ -3,6 +3,8 @@ using namespace ROOT::Math;
 using namespace ROOT::RDF;
 using fourVector=LorentzVector<PtEtaPhiE4D<double>>;
 
+BmnFieldMap* magField{nullptr};
+
 TChain* makeChain(string& filename, const char* treename) {
   cout << "Adding files to chain:" << endl;
   TChain *chain = new TChain(treename);
@@ -159,32 +161,78 @@ vector< vector<float> > covMatrix(RVec<CbmStsTrack> tracks)
   return covariance_matrix;
 }
 
-vector< vector<float> > magneticField(vector<CbmStsTrack> tracks)
+float determinant3x3( const std::array<std::array<float, 3>, 3>& matrix ){
+  auto x_0 = matix[0][0] * ( matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[2][1]  );
+  auto x_1 = matix[0][1] * ( matrix[1][0]*matrix[2][2] - matrix[1][2]*matrix[2][0]  );
+  auto x_2 = matix[0][2] * ( matrix[1][0]*matrix[2][1] - matrix[1][1]*matrix[2][0]  );
+
+  return x_0 - x_1 + x2;
+}
+
+std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::array<float, 3> coordinate ){
+  // Solving the system of equation to extract parameters of quadratic extrapolation of the magnetic field
+  // Ax = B
+  // xi = detAi / detA
+  std::array<std::array<float, 3>, 3> A;
+  A[0] = {1f, 1f, 1f };
+  A[1] = { coordinate[0], coordinate[1], coordinate[2] };
+  A[2] = { coordinate[0]*coordinate[0], coordinate[1]*coordinate[1], coordinate[2]*coordinate[2] };
+
+  auto A0 = A;
+  A0[0] = field;
+  auto A1 = A;
+  A1[1] = field;
+  auto A2 = A;
+  A2[2] = field;
+
+  auto detA = determinant3x3( A );
+  auto detA0 = determinant3x3( A0 );
+  auto detA1 = determinant3x3( A1 );
+  auto detA2 = determinant3x3( A2 );
+
+  auto p0 = detA0 / detA;
+  auto p1 = detA1 / detA;
+  auto p2 = detA2 / detA;
+
+  return {p0, p1, p2};
+}
+
+vector< vector<float> > magneticField(vector<CbmStsTrack> tracks, vector<StsHit> sts_hits)
 {
-  std::vector<L1FieldRegion> field_region;
-  CbmL1PFFitter fitter;
-  fitter.CalculateFieldRegion(tracks, field_region);
   vector<vector<float>> magnetic_field;
-  for (auto& field : field_region) {
+  for (auto& track : tracks) {
+    std::array<float, 3> hit_z;
+    std::array<float, 3> hit_bx;
+    std::array<float, 3> hit_by;
+    std::array<float, 3> hit_bz;
+
+    for( int i=0; i<3; ++i ){
+      // It seems size of the hitmap cannot be less than 4, but just to be safe
+      if( i > track.GetStsHits().GetSize() )
+        magnetic_field.push_back( std::vector<float>(10, 0f) );
+
+      auto sts_idx = track.GetStsHits().At(i);
+      auto x = sts_hits.at(sts_idx).GetX();
+      auto y = sts_hits.at(sts_idx).GetY();
+      auto z = sts_hits.at(sts_idx).GetZ();
+
+      hit_z.at(i) = z;
+      hit_bx.at(i) = magField.GetBx( x, y, z );
+      hit_by.at(i) = magField.GetBy( x, y, z );
+      hit_bz.at(i) = magField.GetBz( x, y, z );
+    }
+
+    auto parameters_bx = cramerFieldSolver3x3( hit_bx, hit_z );
+    auto parameters_by = cramerFieldSolver3x3( hit_by, hit_z );
+    auto parameters_bz = cramerFieldSolver3x3( hit_bz, hit_z );
+
     magnetic_field.emplace_back();
-
-    magnetic_field.back().push_back( field.cx0 );
-    magnetic_field.back().push_back( field.cx1 );
-    magnetic_field.back().push_back( field.cx2 );
-
-    magnetic_field.back().push_back( field.cy0 );
-    magnetic_field.back().push_back( field.cy1 );
-    magnetic_field.back().push_back( field.cy2 );
-
-    magnetic_field.back().push_back( field.cz0 );
-    magnetic_field.back().push_back( field.cz1 );
-    magnetic_field.back().push_back( field.cz2 );
-
-    magnetic_field.back().push_back( field.z0 );
-    // Field region along the track with quadratic approximation
-    // Bx(z) = cx0 + cx1*(z-z0) + cx2*(z-z0)^2
-    // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2
-    // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2
+    for( const auto& c : parameters_bx )
+      magnetic_field.back().push_back( c );
+    for( const auto& c : parameters_by )
+      magnetic_field.back().push_back( c );
+    for( const auto& c : parameters_bz )
+      magnetic_field.back().push_back( c );
   }
   return magnetic_field;
 }
@@ -433,6 +481,13 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
 //  cout << "Sim: " << chainSim->GetEntries() << " events\n";
   chainRec->AddFriend(chainSim);
   ROOT::RDataFrame d(*chainRec);
+
+  BmnFieldPar* fieldPar{nullptr};
+  chainSim->GetFile()->GetObject( "BmnFieldPar", fieldPar );
+  TString mapName;
+  fieldPar->MapName(mapName);
+  magField = new BmnNewFieldMap(mapName);
+  magField->SetScale(fieldPar->GetScale());
 
   // read first Run Header if present
   int nEvents=chainRec->GetEntries();
