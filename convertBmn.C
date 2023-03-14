@@ -482,15 +482,15 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
   chainRec->AddFriend(chainSim);
   ROOT::RDataFrame d(*chainRec);
 
+  // read first Run Header if present
+  int nEvents = chainRec->GetEntries();
+
   BmnFieldPar* fieldPar{nullptr};
   chainSim->GetFile()->GetObject( "BmnFieldPar", fieldPar );
   TString mapName;
   fieldPar->MapName(mapName);
   magField = new BmnNewFieldMap(mapName);
   magField->SetScale(fieldPar->GetScale());
-
-  // read first Run Header if present
-  int nEvents = chainRec->GetEntries();
 //  DstRunHeader* run_header = (DstRunHeader*) chainRec->GetCurrentFile()->Get("DstRunHeader");
 //  if (run_header) {
 //    cout << "\n|||||||||||||||| RUN SUMMARY |||||||||||||||" << endl;
