@@ -197,7 +197,7 @@ std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::arra
   return {p0, p1, p2};
 }
 
-vector< vector<float> > magneticField(vector<CbmStsTrack> tracks, vector<CbmStsHit> sts_hits)
+vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> sts_hits)
 {
   vector<vector<float>> magnetic_field;
   for (auto& track : tracks) {
