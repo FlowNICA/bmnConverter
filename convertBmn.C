@@ -217,9 +217,9 @@ vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> 
       auto z = sts_hits.at(sts_idx).GetZ();
 
       hit_z.at(i) = z;
-      hit_bx.at(i) = magField->GetBx( x, y, z );
-      hit_by.at(i) = magField->GetBy( x, y, z );
-      hit_bz.at(i) = magField->GetBz( x, y, z );
+      hit_bx.at(i) = magField->GetBx( x, y, z ) / 10.0; // KGauss to Tesla
+      hit_by.at(i) = magField->GetBy( x, y, z ) / 10.0; // KGauss to Tesla
+      hit_bz.at(i) = magField->GetBz( x, y, z ) / 10.0; // KGauss to Tesla
     }
 
     auto parameters_bx = cramerFieldSolver3x3( hit_bx, hit_z );
@@ -487,10 +487,8 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
 
   BmnFieldPar* fieldPar{nullptr};
   chainSim->GetFile()->GetObject( "BmnFieldPar", fieldPar );
-  TString mapName;
-  fieldPar->MapName(mapName);
-  magField = new BmnNewFieldMap(mapName);
-  magField->SetScale(fieldPar->GetScale());
+  magField = new BmnNewFieldMap(fieldPar);
+  magField->Init();
 //  DstRunHeader* run_header = (DstRunHeader*) chainRec->GetCurrentFile()->Get("DstRunHeader");
 //  if (run_header) {
 //    cout << "\n|||||||||||||||| RUN SUMMARY |||||||||||||||" << endl;
