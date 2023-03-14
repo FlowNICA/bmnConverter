@@ -547,7 +547,7 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
     .Define("trPos450",recPos450,{"BmnGlobalTrack"})
     .Define("trSimIndex",recSimIndex,{"BmnGlobalTrack","MCTrack"})
     .Define("trCovMatrix", covMatrix, { "StsTrack" })
-    .Define("trMagField", magneticField, { "StsTrack" })
+    .Define("trMagField", magneticField, { "StsTrack", "StsHit" })
     .Define("trStsPos", stsTrackPos, { "StsTrack" })
     .Define("trStsMom", stsTrackMomentum, { "StsTrack" })
     .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
