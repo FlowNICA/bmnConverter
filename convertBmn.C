@@ -217,9 +217,9 @@ vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> 
       auto z = sts_hits.at(sts_idx).GetZ();
 
       hit_z.at(i) = z;
-      hit_bx.at(i) = magField->GetBx( x, y, z ) / 10.0; // KGauss to Tesla
-      hit_by.at(i) = magField->GetBy( x, y, z ) / 10.0; // KGauss to Tesla
-      hit_bz.at(i) = magField->GetBz( x, y, z ) / 10.0; // KGauss to Tesla
+      hit_bx.at(i) = magField->GetBx( x, y, z ); // kGs
+      hit_by.at(i) = magField->GetBy( x, y, z ); // kGs
+      hit_bz.at(i) = magField->GetBz( x, y, z ); // kGs
     }
 
     auto parameters_bx = cramerFieldSolver3x3( hit_bx, hit_z );
