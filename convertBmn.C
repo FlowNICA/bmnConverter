@@ -197,7 +197,7 @@ std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::arra
   return {p0, p1, p2};
 }
 
-vector< vector<float> > magneticField(vector<CbmStsTrack> tracks, vector<StsHit> sts_hits)
+vector< vector<float> > magneticField(vector<CbmStsTrack> tracks, vector<CbmStsHit> sts_hits)
 {
   vector<vector<float>> magnetic_field;
   for (auto& track : tracks) {
@@ -208,18 +208,18 @@ vector< vector<float> > magneticField(vector<CbmStsTrack> tracks, vector<StsHit>
 
     for( int i=0; i<3; ++i ){
       // It seems size of the hitmap cannot be less than 4, but just to be safe
-      if( i > track.GetStsHits().GetSize() )
+      if( i > track.GetStsHits()->GetSize() )
         magnetic_field.push_back( std::vector<float>(10, 0f) );
 
-      auto sts_idx = track.GetStsHits().At(i);
-      auto x = sts_hits.at(sts_idx).GetX();
-      auto y = sts_hits.at(sts_idx).GetY();
-      auto z = sts_hits.at(sts_idx).GetZ();
+      auto sts_idx = track.GetStsHits()->At(i);
+      auto x = sts_hits.at(sts_idx)->GetX();
+      auto y = sts_hits.at(sts_idx)->GetY();
+      auto z = sts_hits.at(sts_idx)->GetZ();
 
       hit_z.at(i) = z;
-      hit_bx.at(i) = magField.GetBx( x, y, z );
-      hit_by.at(i) = magField.GetBy( x, y, z );
-      hit_bz.at(i) = magField.GetBz( x, y, z );
+      hit_bx.at(i) = magField->GetBx( x, y, z );
+      hit_by.at(i) = magField->GetBy( x, y, z );
+      hit_bz.at(i) = magField->GetBz( x, y, z );
     }
 
     auto parameters_bx = cramerFieldSolver3x3( hit_bx, hit_z );
@@ -490,7 +490,7 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
   magField->SetScale(fieldPar->GetScale());
 
   // read first Run Header if present
-  int nEvents=chainRec->GetEntries();
+  int nEvents = chainRec->GetEntries();
 //  DstRunHeader* run_header = (DstRunHeader*) chainRec->GetCurrentFile()->Get("DstRunHeader");
 //  if (run_header) {
 //    cout << "\n|||||||||||||||| RUN SUMMARY |||||||||||||||" << endl;
