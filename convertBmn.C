@@ -209,12 +209,12 @@ vector< vector<float> > magneticField(vector<CbmStsTrack> tracks, vector<CbmStsH
     for( int i=0; i<3; ++i ){
       // It seems size of the hitmap cannot be less than 4, but just to be safe
       if( i > track.GetStsHits()->GetSize() )
-        magnetic_field.push_back( std::vector<float>(10, 0f) );
+        magnetic_field.push_back( std::vector<float>(10, 0.0f) );
 
       auto sts_idx = track.GetStsHits()->At(i);
-      auto x = sts_hits.at(sts_idx)->GetX();
-      auto y = sts_hits.at(sts_idx)->GetY();
-      auto z = sts_hits.at(sts_idx)->GetZ();
+      auto x = sts_hits.at(sts_idx).GetX();
+      auto y = sts_hits.at(sts_idx).GetY();
+      auto z = sts_hits.at(sts_idx).GetZ();
 
       hit_z.at(i) = z;
       hit_bx.at(i) = magField->GetBx( x, y, z );
@@ -242,7 +242,7 @@ vector<XYZTVector> stsTrackPos(RVec<CbmStsTrack> tracks)
   vector<XYZTVector> pos;
   for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
-    pos.push_back( {par->GetX(), par->GetY(), par->GetZ()} );
+    pos.push_back( {par->GetX(), par->GetY(), par->GetZ(), 0.0} );
   }
   return pos;
 }
