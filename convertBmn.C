@@ -233,6 +233,7 @@ vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> 
       magnetic_field.back().push_back( c );
     for( const auto& c : parameters_bz )
       magnetic_field.back().push_back( c );
+    magnetic_field.back().push_back( 0.0 ); // z0
   }
   return magnetic_field;
 }
