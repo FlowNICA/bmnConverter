@@ -143,10 +143,12 @@ vector<XYZVector> recDca(const RVec<BmnGlobalTrack> tracks, const CbmVertex vtx)
   return dca;
 }
 
-vector< vector<float> > covMatrix(RVec<CbmStsTrack> tracks)
+vector< vector<float> > covMatrix(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 {
   vector<vector<float>> covariance_matrix;
-  for (auto& track : tracks) {
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetSilTrackIndex();
+    auto track = tracks.at(idx);
     auto* par = track.GetParamFirst();
     covariance_matrix.emplace_back();
     for( int i=0; i<5; ++i ){
@@ -197,10 +199,12 @@ std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::arra
   return {p0, p1, p2};
 }
 
-vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> sts_hits)
+vector< vector<float> > magneticField(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks, RVec<CbmStsHit> sts_hits)
 {
   vector<vector<float>> magnetic_field;
-  for (auto& track : tracks) {
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetSilTrackIndex();
+    auto track = tracks.at(idx);
     std::array<float, 3> hit_z;
     std::array<float, 3> hit_bx;
     std::array<float, 3> hit_by;
@@ -238,10 +242,12 @@ vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> 
   return magnetic_field;
 }
 
-vector<vector<float>> stsTrackParameters(RVec<CbmStsTrack> tracks)
+vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 {
   vector<vector<float>> parameters;
-  for (auto& track : tracks) {
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetSilTrackIndex();
+    auto track = tracks.at(idx);
     auto* par = track.GetParamFirst();
     parameters.emplace_back();
     parameters.back().push_back( par->GetX() );
@@ -551,9 +557,9 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
     .Define("trPosLast",recPosLast,{"BmnGlobalTrack"})
     .Define("trPos450",recPos450,{"BmnGlobalTrack"})
     .Define("trSimIndex",recSimIndex,{"BmnGlobalTrack","MCTrack"})
-    .Define("stsTrackCovMatrix", covMatrix, { "StsTrack" })
-    .Define("stsTrackMagField", magneticField, { "StsTrack", "StsHit" })
-    .Define("stsTrackParameters", stsTrackParameters, { "StsTrack" })
+    .Define("stsTrackCovMatrix", covMatrix, { "BmnGlobalTrack", "StsTrack" })
+    .Define("stsTrackMagField", magneticField, { "BmnGlobalTrack", "StsTrack", "StsHit" })
+    .Define("stsTrackParameters", stsTrackParameters, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackMomentum", stsTrackMomentum, { "StsTrack" })
     .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
     .Define("tof400hitT","BmnTof400Hit.fTimeStamp")
