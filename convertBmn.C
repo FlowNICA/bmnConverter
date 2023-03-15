@@ -237,9 +237,9 @@ vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> 
   return magnetic_field;
 }
 
-vector<float> stsTrackParameters(RVec<CbmStsTrack> tracks)
+vector<vector<float>> stsTrackParameters(RVec<CbmStsTrack> tracks)
 {
-  vector<float> parameters;
+  vector<vector<float>> parameters;
   for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
     parameters.emplace_back();
