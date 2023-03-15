@@ -237,14 +237,20 @@ vector< vector<float> > magneticField(RVec<CbmStsTrack> tracks, RVec<CbmStsHit> 
   return magnetic_field;
 }
 
-vector<XYZTVector> stsTrackPos(RVec<CbmStsTrack> tracks)
+vector<float> stsTrackParameters(RVec<CbmStsTrack> tracks)
 {
-  vector<XYZTVector> pos;
+  vector<float> parameters;
   for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
-    pos.push_back( {par->GetX(), par->GetY(), par->GetZ(), 0.0} );
+    parameters.emplace_back();
+    parameters.back().push_back( par->GetX() );
+    parameters.back().push_back( par->GetY() );
+    parameters.back().push_back( par->GetZ() );
+    parameters.back().push_back( par->GetTx() );
+    parameters.back().push_back( par->GetTy() );
+    parameters.back().push_back( par->GetQp() );
   }
-  return pos;
+  return parameters;
 }
 
 vector<fourVector> stsTrackMomentum(RVec<CbmStsTrack> tracks)
@@ -544,10 +550,10 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
     .Define("trPosLast",recPosLast,{"BmnGlobalTrack"})
     .Define("trPos450",recPos450,{"BmnGlobalTrack"})
     .Define("trSimIndex",recSimIndex,{"BmnGlobalTrack","MCTrack"})
-    .Define("trCovMatrix", covMatrix, { "StsTrack" })
-    .Define("trMagField", magneticField, { "StsTrack", "StsHit" })
-    .Define("trStsPos", stsTrackPos, { "StsTrack" })
-    .Define("trStsMom", stsTrackMomentum, { "StsTrack" })
+    .Define("stsTrackCovMatrix", covMatrix, { "StsTrack" })
+    .Define("stsTrackMagField", magneticField, { "StsTrack", "StsHit" })
+    .Define("stsTrackParameters", stsTrackParameters, { "StsTrack" })
+    .Define("stsTrackMomentum", stsTrackMomentum, { "StsTrack" })
     .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
     .Define("tof400hitT","BmnTof400Hit.fTimeStamp")
     .Define("tof400hitL","BmnTof400Hit.fLength")
