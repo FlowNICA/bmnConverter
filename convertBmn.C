@@ -147,7 +147,7 @@ vector< vector<float> > covMatrix(RVec<BmnGlobalTrack> global_tracks, RVec<CbmSt
 {
   vector<vector<float>> covariance_matrix;
   for (auto& global_track : global_tracks) {
-    auto idx = global_track.SetGemTrackIndex();
+    auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
     auto* par = track.GetParamFirst();
     covariance_matrix.emplace_back();
@@ -203,7 +203,7 @@ vector< vector<float> > magneticField(RVec<BmnGlobalTrack> global_tracks, RVec<C
 {
   vector<vector<float>> magnetic_field;
   for (auto& global_track : global_tracks) {
-    auto idx = global_track.SetGemTrackIndex();
+    auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
     std::array<float, 3> hit_z;
     std::array<float, 3> hit_bx;
@@ -246,7 +246,7 @@ vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVe
 {
   vector<vector<float>> parameters;
   for (auto& global_track : global_tracks) {
-    auto idx = global_track.SetGemTrackIndex();
+    auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
     auto* par = track.GetParamFirst();
     parameters.emplace_back();
