@@ -24,5 +24,5 @@ module add GCC-Toolchain/
 source /scratch1/mmamaev/bmn_environment.sh
 
 mkdir $out
-time root -b -l -q /scratch1/mmamaev/bmnConverter/convertBmn.C"(\"${in}/${id}/dst2_geant_output.root\", \"${in}/${id}/geant_output.root\", \"${out}/$((${id}+${shft})).tree.root\")"
+time root -b -l -q /scratch1/mmamaev/bmnConverter/convertBmn.C"(\"${in}/${id}/dst_geant_output.root\", \"${in}/${id}/geant_output.root\", \"${in}/${id}/full_geometry.root\", \"${out}/$((${id}+${shft})).tree.root\")"
 time root -b -l -q /scratch1/mmamaev/bmnConverter/qa.C"(\"${out}/$((${id}+${shft})).tree.root\", \"${out}/qa/$((${id}+${shft})).qa.root\")"
