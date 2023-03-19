@@ -19,7 +19,9 @@ out=/scratch1/mmamaev/data/DCM-QGSM-SMM/3.0
 mkdir -pv $out
 mkdir -pv $out/qa
 
-. /scratch1/mmamaev/bmn_environment.sh
+source /cvmfs/nica.jinr.ru/sw/os/login.sh
+module add GCC-Toolchain/
+source /scratch1/mmamaev/bmn_environment.sh
 
 mkdir $out
 time root -b -l -q /scratch1/mmamaev/bmnConverter/convertBmn.C"(\"${in}/${id}/dst2_geant_output.root\", \"${in}/${id}/geant_output.root\", \"${out}/$((${id}+${shft})).tree.root\")"
