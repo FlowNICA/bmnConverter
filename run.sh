@@ -14,7 +14,7 @@
 in=$1
 shft=$2
 [ -z $shft ] && shft=0
-id=$SLURM_ARRAY_TASK_ID
+id=$SGE_TASK_ID
 out=/scratch1/mmamaev/data/DCM-QGSM-SMM/3.0
 mkdir -pv $out
 mkdir -pv $out/qa
