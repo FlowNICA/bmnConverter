@@ -260,10 +260,12 @@ vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVe
   return parameters;
 }
 
-vector<fourVector> stsTrackMomentum(RVec<CbmStsTrack> tracks)
+vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 {
   vector<fourVector> momenta;
-  for (auto& track : tracks) {
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetGemTrackIndex();
+    auto track = tracks.at(idx);
     auto *par = track.GetParamFirst();
     TVector3 mom;
     par->Momentum(mom);
