@@ -274,6 +274,22 @@ vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<Cbm
   return momenta;
 }
 
+std::vector<int> stsTrackSimPdg(ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
+  std::vector<int> pdg;
+  for( auto idx : sim_index ) {
+    if( idx < 0 ) {
+      pdg.push_back(-1);
+      continue;
+    }
+    if( idx > sim_pdg.size() ) {
+      pdg.push_back(-1);
+      continue;
+    }
+    pdg.push_back(sim_pdg.at(idx));
+  }
+  return pdg;
+}
+
 RVec<int> recSimIndex(const RVec<BmnGlobalTrack> recTracks, const RVec<CbmMCTrack> simTracks)
 {
   vector<int> newIndex;
@@ -563,6 +579,7 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
     .Define("stsTrackMagField", magneticField, { "BmnGlobalTrack", "StsTrack", "StsHit" })
     .Define("stsTrackParameters", stsTrackParameters, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackMomentum", stsTrackMomentum, { "BmnGlobalTrack", "StsTrack" })
+    .Define("stsTrackSimPdg", stsTrackSimPdg, { "trSimIndex", "simPdg" })
     .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
     .Define("tof400hitT","BmnTof400Hit.fTimeStamp")
     .Define("tof400hitL","BmnTof400Hit.fLength")
