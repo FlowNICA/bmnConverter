@@ -163,6 +163,24 @@ vector< vector<float> > covMatrix(RVec<BmnGlobalTrack> global_tracks, RVec<CbmSt
   return covariance_matrix;
 }
 
+vector< vector<float> > globalTrackCovMatrix(RVec<BmnGlobalTrack> global_tracks)
+{
+  vector<vector<float>> covariance_matrix;
+  for (auto& global_track : global_tracks) {
+    auto* par = global_track.GetParamFirst();
+    covariance_matrix.emplace_back();
+    for( int i=0; i<5; ++i ){
+      for( int j=0; j<=i; ++j ){
+        covariance_matrix.back().push_back( par->GetCovariance(i, j) );
+      }
+    }
+    // Lower triangle of the symmetric covariance matrix
+    // C[x, y, tx, ty, Qp]
+    // { c_00, c1[0..1], c2[0..2], ... c4[0..4] }
+  }
+  return covariance_matrix;
+}
+
 float determinant3x3( const std::array<std::array<float, 3>, 3>& matrix ){
   auto x_0 = matrix[0][0] * ( matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[2][1]  );
   auto x_1 = matrix[0][1] * ( matrix[1][0]*matrix[2][2] - matrix[1][2]*matrix[2][0]  );
@@ -249,6 +267,22 @@ vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVe
     auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
     auto* par = track.GetParamFirst();
+    parameters.emplace_back();
+    parameters.back().push_back( par->GetX() );
+    parameters.back().push_back( par->GetY() );
+    parameters.back().push_back( par->GetZ() );
+    parameters.back().push_back( par->GetTx() );
+    parameters.back().push_back( par->GetTy() );
+    parameters.back().push_back( par->GetQp() );
+  }
+  return parameters;
+}
+
+vector<vector<float>> globalTrackParameters(RVec<BmnGlobalTrack> global_tracks)
+{
+  vector<vector<float>> parameters;
+  for (auto& global_track : global_tracks) {
+    auto* par = global_track.GetParamFirst();
     parameters.emplace_back();
     parameters.back().push_back( par->GetX() );
     parameters.back().push_back( par->GetY() );
@@ -578,6 +612,8 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
     .Define("stsTrackCovMatrix", covMatrix, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackMagField", magneticField, { "BmnGlobalTrack", "StsTrack", "StsHit" })
     .Define("stsTrackParameters", stsTrackParameters, { "BmnGlobalTrack", "StsTrack" })
+    .Define("globalTrackParameters", globalTrackParameters, { "BmnGlobalTrack" })
+    .Define("globalTrackCovMatrix", globalTrackCovMatrix, { "BmnGlobalTrack" })
     .Define("stsTrackMomentum", stsTrackMomentum, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackSimPdg", stsTrackSimPdg, { "trSimIndex", "simPdg" })
     .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
