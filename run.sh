@@ -15,8 +15,7 @@ in=$1
 out=$2
 id=$SGE_TASK_ID
 
-mkdir -pv $out
-#mkdir -pv $out/qa
+mkdir -p $out
 
 source /cvmfs/nica.jinr.ru/sw/os/login.sh
 module add GCC-Toolchain/
