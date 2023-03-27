@@ -308,6 +308,49 @@ vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<Cbm
   return momenta;
 }
 
+vector<float> stsTrackChi2Ndf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
+{
+  vector<float> chi2;
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetGemTrackIndex();
+    auto track = tracks.at(idx);
+
+    auto chi2 = track.GetChi2();
+    auto ndf = track.GetNDF();
+
+    chi2.push_back( chi2/ndf );
+  }
+  return chi2;
+}
+
+vector<int> stsTrackNdf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
+{
+  vector<int> vec_ndf;
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetGemTrackIndex();
+    auto track = tracks.at(idx);
+
+    auto ndf = track.GetNDF();
+
+    vec_ndf.push_back( ndf );
+  }
+  return vec_ndf;
+}
+
+vector<int> stsTrackNhits(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
+{
+  vector<int> vec_ndf;
+  for (auto& global_track : global_tracks) {
+    auto idx = global_track.GetGemTrackIndex();
+    auto track = tracks.at(idx);
+
+    auto ndf = track.GetNStsHits();
+
+    vec_ndf.push_back( ndf );
+  }
+  return vec_ndf;
+}
+
 std::vector<int> stsTrackSimPdg(ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
   std::vector<int> pdg;
   for( auto idx : sim_index ) {
@@ -615,6 +658,9 @@ void convertBmn (string inReco="data/run8/rec.root", string inSim="data/run8/sim
     .Define("globalTrackParameters", globalTrackParameters, { "BmnGlobalTrack" })
     .Define("globalTrackCovMatrix", globalTrackCovMatrix, { "BmnGlobalTrack" })
     .Define("stsTrackMomentum", stsTrackMomentum, { "BmnGlobalTrack", "StsTrack" })
+    .Define("stsTrackChi2Ndf", stsTrackChi2Ndf, { "BmnGlobalTrack", "StsTrack" })
+    .Define("stsTrackNdf", stsTrackNdf, { "BmnGlobalTrack", "StsTrack" })
+    .Define("stsTrackNhits", stsTrackNhits, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackSimPdg", stsTrackSimPdg, { "trSimIndex", "simPdg" })
     .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
     .Define("tof400hitT","BmnTof400Hit.fTimeStamp")
