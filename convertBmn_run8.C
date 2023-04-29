@@ -620,6 +620,8 @@ void convertBmn (string inReco="data/run8/rec.root")
   }
 
   auto magField = new BmnNewFieldMap("field_sp41v5_ascii_Extrap.root");
+  Double_t fieldScale = 1800. / 900.;
+  magField->SetScale(fieldScale);
   magField->Init();
 
   auto scwallModPos=modulePos(geoFile,"scwall");
