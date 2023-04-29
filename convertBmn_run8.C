@@ -606,7 +606,7 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
 
   gRandom->SetSeed(0);
   TString geoFileName = Form("current_geo_file_%d.root", UInt_t(gRandom->Integer(UINT32_MAX)));
-  Int_t res_code = UniRun::ReadGeometryFile(run_period, run_number, (char*)geoFileName.Data());
+  Int_t res_code = UniRun::ReadGeometryFile(run_header->GetPeriodNumber(), run_header->GetRunNumber(), (char*)geoFileName.Data());
   if (res_code != 0) {
     cout << "ERROR: could not read geometry file from the database" << endl;
     exit(-3);
@@ -624,9 +624,9 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
   magField->SetScale(fieldScale);
   magField->Init();
 
-  auto scwallModPos=modulePos(geoFile,"scwall");
-  auto hodoModPos=modulePos(geoFile,"hodo");
-  auto fhcalModPos=modulePos(geoFile,"fhcal");
+  auto scwallModPos=modulePos(geoFileName.Data(),"scwall");
+  auto hodoModPos=modulePos(geoFileName.Data(),"hodo");
+  auto fhcalModPos=modulePos(geoFileName.Data(),"fhcal");
   
   auto dd=d
 //    .Range(0,1000)
