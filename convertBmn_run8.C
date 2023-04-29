@@ -663,7 +663,7 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
     .Define("stsTrackChi2Ndf", stsTrackChi2Ndf, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackNdf", stsTrackNdf, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackNhits", stsTrackNhits, { "BmnGlobalTrack", "StsTrack" })
-    .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
+//    .Define("tof400hitPos",tofHitPosition,{"BmnTof400Hit"})
 //    .Define("tof400hitT","BmnTof400Hit.fTimeStamp")
 //    .Define("tof400hitL","BmnTof400Hit.fLength")
 //    .Define("tof400hitResX","BmnTof400Hit.fResX")
