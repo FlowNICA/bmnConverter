@@ -581,7 +581,7 @@ RVec<float> mcPointEloss(const TClonesArray points)
   return el;
 }
 
-void convertBmn (string inReco="data/run8/rec.root")
+void convertBmn (string inReco="data/run8/rec.root", std::string fileOut = "out.tree.root")
 {
   TChain *chainRec=makeChain(inReco, "bmndata");
   ROOT::RDataFrame d(*chainRec);
@@ -714,5 +714,5 @@ void convertBmn (string inReco="data/run8/rec.root")
     if (!exclude)
       definedNames.push_back(definedName);
   }
-  dd.Snapshot("t",out, definedNames);
+  dd.Snapshot("t", fileOut, definedNames);
 }
