@@ -581,7 +581,7 @@ RVec<float> mcPointEloss(const TClonesArray points)
   return el;
 }
 
-void convertBmn (string inReco="data/run8/rec.root", std::string fileOut = "out.tree.root")
+void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = "out.tree.root")
 {
   TChain *chainRec=makeChain(inReco, "bmndata");
   ROOT::RDataFrame d(*chainRec);
