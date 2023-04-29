@@ -310,7 +310,7 @@ vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<Cbm
 
 vector<float> stsTrackChi2Ndf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 {
-  vector<float> chi2;
+  vector<float> vec_chi2;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
@@ -318,9 +318,9 @@ vector<float> stsTrackChi2Ndf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTra
     auto chi2 = track.GetChi2();
     auto ndf = track.GetNDF();
 
-    chi2.push_back( chi2/ndf );
+    vec_chi2.push_back( chi2/ndf );
   }
-  return chi2;
+  return vec_chi2;
 }
 
 vector<int> stsTrackNdf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
