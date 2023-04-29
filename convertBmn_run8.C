@@ -593,7 +593,7 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
     cout << "\n|||||||||||||||| RUN SUMMARY |||||||||||||||" << endl;
     cout << "||\t\t\t\t\t  ||" << endl;
     cout << "||   Period:        " << run_header->GetPeriodNumber() << "\t\t\t  ||" << endl;
-    cout << "||   Number:        " << run_header->GetRunNumber() << "\t\t\t  ||" << endl;
+    cout << "||   Number:        " << run_header->GetRunNumber() << "\t\t  ||" << endl;
     cout << "||   Start Time:    " << run_header->GetStartTime().AsString("s") << "\t  ||" << endl;
     cout << "||   End Time:      " << run_header->GetFinishTime().AsString("s") << "\t  ||" << endl;
     cout << "||   Beam:          A = " << run_header->GetBeamA() << ", Z = " << run_header->GetBeamA() << "\t  ||" << endl;
@@ -619,8 +619,21 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
     exit(-4);
   }
 
-  auto magField = new BmnNewFieldMap("field_sp41v5_ascii_Extrap.root");
-  Double_t fieldScale = 1800. / 900.;
+  UniRun* pCurrentRun = UniRun::GetRun(run_header->GetPeriodNumber(), run_header->GetRunNumber());
+  if (pCurrentRun == 0)
+    exit(-6);
+  Double_t* field_voltage = pCurrentRun->GetFieldVoltage();
+  if (field_voltage == NULL) {
+    cout << "ERROR: no field voltage was found for run " << run_header->GetPeriodNumber() << ":" <<  run_header->GetRunNumber() << endl;
+    exit(-7);
+  }
+  Double_t map_current = 55.87;
+  if (*field_voltage < 10) {
+    fieldScale = 0;
+  } else
+    fieldScale = (*field_voltage) / map_current;
+
+  magField = new BmnNewFieldMap("field_sp41v5_ascii_Extrap.root");
   magField->SetScale(fieldScale);
   magField->Init();
 
