@@ -654,7 +654,6 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
     .Define("trBetaTof700","BmnGlobalTrack.fBeta700")
     .Define("trPosLast",recPosLast,{"BmnGlobalTrack"})
     .Define("trPos450",recPos450,{"BmnGlobalTrack"})
-    .Define("trSimIndex",recSimIndex,{"BmnGlobalTrack","MCTrack"})
     .Define("stsTrackCovMatrix", covMatrix, { "BmnGlobalTrack", "StsTrack" })
     .Define("stsTrackMagField", magneticField, { "BmnGlobalTrack", "StsTrack", "StsHit" })
     .Define("stsTrackParameters", stsTrackParameters, { "BmnGlobalTrack", "StsTrack" })
