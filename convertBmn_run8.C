@@ -628,6 +628,7 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
     exit(-7);
   }
   Double_t map_current = 55.87;
+  Double_t fieldScale = 0.
   if (*field_voltage < 10) {
     fieldScale = 0;
   } else
