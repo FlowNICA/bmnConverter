@@ -158,9 +158,7 @@ try {
 vector< vector<float> > covMatrix(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
   vector<vector<float>> covariance_matrix;
-  for (auto& global_track : global_tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
+  for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
     covariance_matrix.emplace_back();
     for( int i=0; i<5; ++i ){
@@ -244,9 +242,7 @@ std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::arra
 vector< vector<float> > magneticField(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks, RVec<CbmStsHit> sts_hits)
 try {
   vector<vector<float>> magnetic_field;
-  for (auto& global_track : global_tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
+  for (auto& track : tracks ) {
     std::array<float, 3> hit_z;
     std::array<float, 3> hit_bx;
     std::array<float, 3> hit_by;
@@ -290,9 +286,7 @@ try {
 vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
   vector<vector<float>> parameters;
-  for (auto& global_track : global_tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
+  for (auto& track : tracks) {
     auto* par = track.GetParamFirst();
     parameters.emplace_back();
     parameters.back().push_back( par->GetX() );
@@ -330,9 +324,7 @@ try {
 vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
   vector<fourVector> momenta;
-  for (auto& global_track : global_tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
+  for (auto& track : tracks) {
     auto *par = track.GetParamFirst();
     TVector3 mom;
     par->Momentum(mom);
@@ -347,10 +339,7 @@ try {
 vector<float> stsTrackChi2Ndf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
   vector<float> vec_chi2;
-  for (auto& global_track : global_tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
-
+  for (auto& track : tracks) {
     auto chi2 = track.GetChi2();
     auto ndf = track.GetNDF();
 
@@ -365,7 +354,7 @@ try {
 vector<int> stsTrackNdf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
   vector<int> vec_ndf;
-  for (auto& global_track : global_tracks) {
+  for (auto& track : tracks) {
     auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
 
@@ -382,7 +371,7 @@ try {
 vector<int> stsTrackNhits(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
   vector<int> vec_ndf;
-  for (auto& global_track : global_tracks) {
+  for (auto& track : tracks) {
     auto idx = global_track.GetGemTrackIndex();
     auto track = tracks.at(idx);
 
