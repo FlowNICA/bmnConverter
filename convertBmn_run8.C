@@ -355,9 +355,6 @@ vector<int> stsTrackNdf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tr
 try {
   vector<int> vec_ndf;
   for (auto& track : tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
-
     auto ndf = track.GetNDF();
 
     vec_ndf.push_back( ndf );
@@ -372,9 +369,6 @@ vector<int> stsTrackNhits(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> 
 try {
   vector<int> vec_ndf;
   for (auto& track : tracks) {
-    auto idx = global_track.GetGemTrackIndex();
-    auto track = tracks.at(idx);
-
     auto ndf = track.GetNStsHits();
 
     vec_ndf.push_back( ndf );
