@@ -104,15 +104,18 @@ RVec<short> simCharge (const RVec<int> pdg)
 }
 
 vector<float> trackP(const RVec<BmnGlobalTrack> tracks)
-{
+try {
   vector<float> momenta;
   for (auto track:tracks)
     momenta.push_back(1./track.GetParamFirst()->GetQp());
   return momenta;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<fourVector> trackMomentum(const RVec<BmnGlobalTrack> tracks)
-{
+try {
   vector<fourVector> momenta;
   for (auto track:tracks) {
     auto *par = track.GetParamFirst();   
@@ -121,30 +124,39 @@ vector<fourVector> trackMomentum(const RVec<BmnGlobalTrack> tracks)
     momenta.push_back({mom.Pt(),mom.Eta(),mom.Phi(),0});
   }   
   return momenta;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 RVec<short> recCharge(const RVec<BmnGlobalTrack> tracks)
-{
+try {
   vector<short> charge;
   for (auto track:tracks) {
     int q = track.GetParamFirst()->GetQp() > 0 ? 1 : -1;
     charge.push_back(q);
   }
   return charge;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<XYZVector> recDca(const RVec<BmnGlobalTrack> tracks, const CbmVertex vtx)
-{
+try {
   vector<XYZVector> dca;
   for (auto track:tracks) {
     auto par = track.GetParamFirst();
     dca.push_back({par->GetX()-vtx.GetX(),par->GetY()-vtx.GetY(),par->GetZ()-vtx.GetZ()});
   }
   return dca;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector< vector<float> > covMatrix(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
-{
+try {
   vector<vector<float>> covariance_matrix;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -161,10 +173,13 @@ vector< vector<float> > covMatrix(RVec<BmnGlobalTrack> global_tracks, RVec<CbmSt
     // { c_00, c1[0..1], c2[0..2], ... c4[0..4] }
   }
   return covariance_matrix;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector< vector<float> > globalTrackCovMatrix(RVec<BmnGlobalTrack> global_tracks)
-{
+try {
   vector<vector<float>> covariance_matrix;
   for (auto& global_track : global_tracks) {
     auto* par = global_track.GetParamFirst();
@@ -179,17 +194,23 @@ vector< vector<float> > globalTrackCovMatrix(RVec<BmnGlobalTrack> global_tracks)
     // { c_00, c1[0..1], c2[0..2], ... c4[0..4] }
   }
   return covariance_matrix;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
-float determinant3x3( const std::array<std::array<float, 3>, 3>& matrix ){
+float determinant3x3( const std::array<std::array<float, 3>, 3>& matrix ) try {
   auto x_0 = matrix[0][0] * ( matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[2][1]  );
   auto x_1 = matrix[0][1] * ( matrix[1][0]*matrix[2][2] - matrix[1][2]*matrix[2][0]  );
   auto x_2 = matrix[0][2] * ( matrix[1][0]*matrix[2][1] - matrix[1][1]*matrix[2][0]  );
 
   return x_0 - x_1 + x_2;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
-std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::array<float, 3> coordinate ){
+std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::array<float, 3> coordinate ) try {
   // Solving the system of equation to extract parameters of quadratic extrapolation of the magnetic field
   // Ax = B
   // xi = detAi / detA
@@ -215,10 +236,13 @@ std::array<float, 3> cramerFieldSolver3x3( std::array<float, 3> field, std::arra
   auto p2 = detA2 / detA;
 
   return {p0, p1, p2};
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector< vector<float> > magneticField(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks, RVec<CbmStsHit> sts_hits)
-{
+try {
   vector<vector<float>> magnetic_field;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -258,10 +282,13 @@ vector< vector<float> > magneticField(RVec<BmnGlobalTrack> global_tracks, RVec<C
     magnetic_field.back().push_back( 0.0 ); // z0
   }
   return magnetic_field;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
-{
+try {
   vector<vector<float>> parameters;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -276,10 +303,13 @@ vector<vector<float>> stsTrackParameters(RVec<BmnGlobalTrack> global_tracks, RVe
     parameters.back().push_back( par->GetQp() );
   }
   return parameters;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<vector<float>> globalTrackParameters(RVec<BmnGlobalTrack> global_tracks)
-{
+try {
   vector<vector<float>> parameters;
   for (auto& global_track : global_tracks) {
     auto* par = global_track.GetParamFirst();
@@ -292,10 +322,13 @@ vector<vector<float>> globalTrackParameters(RVec<BmnGlobalTrack> global_tracks)
     parameters.back().push_back( par->GetQp() );
   }
   return parameters;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
-{
+try {
   vector<fourVector> momenta;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -306,10 +339,13 @@ vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<Cbm
     momenta.push_back({mom.Pt(),mom.Eta(),mom.Phi(),0});
   }
   return momenta;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<float> stsTrackChi2Ndf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
-{
+try {
   vector<float> vec_chi2;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -321,10 +357,13 @@ vector<float> stsTrackChi2Ndf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTra
     vec_chi2.push_back( chi2/ndf );
   }
   return vec_chi2;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<int> stsTrackNdf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
-{
+try {
   vector<int> vec_ndf;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -335,10 +374,13 @@ vector<int> stsTrackNdf(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tr
     vec_ndf.push_back( ndf );
   }
   return vec_ndf;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<int> stsTrackNhits(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
-{
+try {
   vector<int> vec_ndf;
   for (auto& global_track : global_tracks) {
     auto idx = global_track.GetGemTrackIndex();
@@ -349,9 +391,12 @@ vector<int> stsTrackNhits(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> 
     vec_ndf.push_back( ndf );
   }
   return vec_ndf;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
-std::vector<int> stsTrackSimPdg(ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
+std::vector<int> stsTrackSimPdg(ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg) try {
   std::vector<int> pdg;
   for( auto idx : sim_index ) {
     if( idx < 0 ) {
@@ -365,10 +410,13 @@ std::vector<int> stsTrackSimPdg(ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps:
     pdg.push_back(sim_pdg.at(idx));
   }
   return pdg;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 RVec<int> recSimIndex(const RVec<BmnGlobalTrack> recTracks, const RVec<CbmMCTrack> simTracks)
-{
+try {
   vector<int> newIndex;
   int shift=0;
   int nSimTracks = simTracks.size();
@@ -390,38 +438,50 @@ RVec<int> recSimIndex(const RVec<BmnGlobalTrack> recTracks, const RVec<CbmMCTrac
       simIndex.push_back(newIndex.at(oldIndex));
   }
   return simIndex;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<XYZVector> recPosLast(const RVec<BmnGlobalTrack> tracks)
-{
+try {
   vector<XYZVector> pos;
   for (auto track:tracks){
     auto par=track.GetParamLast();
     pos.push_back({par->GetX(), par->GetY(), par->GetZ()});
   }
   return pos;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<XYZVector> recPos450(const RVec<BmnGlobalTrack> tracks)
-{
+try {
   vector<XYZVector> pos;
   for (auto track:tracks) 
     pos.push_back(ExtrapolateStraightLine(track.GetParamLast(), 450));
   return pos;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<XYZVector> tofHitPosition(const TClonesArray hits)
-{
+try {
   vector<XYZVector> pos;
   for (const auto& hitObj:hits){
     auto hit=(BmnTofHit*)hitObj;
     pos.push_back({hit->GetX(),hit->GetY(),hit->GetZ()});
   }
   return pos;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<XYZVector> tofRes(const RVec<BmnGlobalTrack> tracks, const TClonesArray hits)
-{
+try {
   vector<XYZVector> res;
   auto testHit=(BmnTofHit*)hits.At(0);
   if (testHit)
@@ -447,18 +507,24 @@ vector<XYZVector> tofRes(const RVec<BmnGlobalTrack> tracks, const TClonesArray h
     }
   }
   return res;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 RVec<int> moduleId (const vector<XYZVector> modulePos)
-{
+try {
   vector <int> moduleIds;
   for (int i=0;i<modulePos.size();i++)
     moduleIds.push_back(i+1);
   return moduleIds;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 vector<XYZVector> modulePos (const char *geoFile, const char *detectorTag)
-{
+try {
   bool verbose=false;
   map <int,XYZVector> modulePosMap;
   printf("Reading %s geometry from geometry file\n", detectorTag);
@@ -525,18 +591,24 @@ vector<XYZVector> modulePos (const char *geoFile, const char *detectorTag)
       printf("%d: (%f, %f, %f)\n", i, modulePosVector.at(i).x(), modulePosVector.at(i).y(), modulePosVector.at(i).z());
   }
   return modulePosVector;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 RVec<float> fhcalModE(BmnFHCalEvent event)
-{
+try {
   vector<float> fhcalModEnergy_;
   for (int i = 0; i < 54; i++)
     fhcalModEnergy_.push_back(event.GetModule(i+1)->GetEnergy());
   return fhcalModEnergy_;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 RVec<float> getEloss(const RVec<int> moduleId, const RVec<double> eLossDigis, const vector<XYZVector> modulePos)
-{
+try {
   int nModules=modulePos.size();
   vector<float> eLossModules(nModules,0);
   int nDigis=eLossDigis.size();
@@ -544,6 +616,9 @@ RVec<float> getEloss(const RVec<int> moduleId, const RVec<double> eLossDigis, co
     if(moduleId.at(i) <= nModules)
       eLossModules.at(moduleId.at(i)-1)=eLossDigis.at(i);
   return eLossModules;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
 }
 
 RVec<float> fdEloss (const RVec<BmnFDPoint> points)
