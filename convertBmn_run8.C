@@ -702,8 +702,9 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
   
   auto dd=d
 //    .Range(0,1000)
-    .Define("inputsAR","DstEventHeader.fInputsAR")
-    .Define("inputsBR","DstEventHeader.fInputsBR")
+    .Define("inputsAR","BmnTrigInfo.fBC1Integral")
+    .Define("inputsBR","BmnTrigInfo.fBC1Amp")
+    .Define("inputsBR","BmnTrigInfo.fBC2Amp")
     .Define("evtId","DstEventHeader.fEventId")
     .Define("vtxX","PrimaryVertex.fX")
     .Define("vtxY","PrimaryVertex.fY")
