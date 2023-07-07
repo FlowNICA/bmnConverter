@@ -320,6 +320,42 @@ try {
   std::cout << __func__ << std::endl;
   throw e;
 }
+vector<vector<float>> trParamFirst(RVec<BmnGlobalTrack> global_tracks)
+try {
+  vector<vector<float>> parameters;
+  for (auto& global_track : global_tracks) {
+    auto* par = global_track.GetParamFirst();
+    parameters.emplace_back();
+    parameters.back().push_back( par->GetX() );
+    parameters.back().push_back( par->GetY() );
+    parameters.back().push_back( par->GetZ() );
+    parameters.back().push_back( par->GetTx() );
+    parameters.back().push_back( par->GetTy() );
+    parameters.back().push_back( par->GetQp() );
+  }
+  return parameters;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
+}
+vector<vector<float>> trParamLast(RVec<BmnGlobalTrack> global_tracks)
+try {
+  vector<vector<float>> parameters;
+  for (auto& global_track : global_tracks) {
+    auto* par = global_track.GetParamLast();
+    parameters.emplace_back();
+    parameters.back().push_back( par->GetX() );
+    parameters.back().push_back( par->GetY() );
+    parameters.back().push_back( par->GetZ() );
+    parameters.back().push_back( par->GetTx() );
+    parameters.back().push_back( par->GetTy() );
+    parameters.back().push_back( par->GetQp() );
+  }
+  return parameters;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
+}
 
 vector<fourVector> stsTrackMomentum(RVec<BmnGlobalTrack> global_tracks, RVec<CbmStsTrack> tracks)
 try {
@@ -730,6 +766,8 @@ void convertBmn_run8 (string inReco="data/run8/rec.root", std::string fileOut = 
     .Define("stsTrackCovMatrix", covMatrix, { "BmnGlobalTrack", "StsVector" })
     .Define("stsTrackMagField", magneticField, { "BmnGlobalTrack", "StsVector", "StsHit" })
     .Define("stsTrackParameters", stsTrackParameters, { "BmnGlobalTrack", "StsVector" })
+    .Define("trParamFirst", trParamFirst, { "BmnGlobalTrack" })
+    .Define("trParamLast", trParamLast, { "BmnGlobalTrack" })
     .Define("globalTrackParameters", globalTrackParameters, { "BmnGlobalTrack" })
     .Define("globalTrackCovMatrix", globalTrackCovMatrix, { "BmnGlobalTrack" })
     .Define("stsTrackMomentum", stsTrackMomentum, { "BmnGlobalTrack", "StsVector" })
