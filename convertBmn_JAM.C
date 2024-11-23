@@ -668,6 +668,82 @@ try {
   throw e;
 }
 
+vector<XYZVector> modulePosDirect (const char *geoFile, const char *detectorTag)
+{
+  bool verbose = true;
+  map <int,XYZVector> modulePosMap;
+  printf("Reading %s geometry from geometry file\n", detectorTag);
+  TFile *fiGeo = new TFile(geoFile, "read");
+  TGeoVolumeAssembly *tgva = (TGeoVolumeAssembly *) fiGeo->Get("TOP");
+  if (!tgva)
+    throw runtime_error(Form("ERROR: No TGeoVolumeAssembly in file %s", geoFile));
+  TGeoNode *topNode = tgva->GetNode(0);
+  if (!topNode)
+    throw runtime_error(Form("ERROR: No top node found in file %s", geoFile));
+  // Declare nodes for left and right parts of the detector
+  std::vector<TGeoNode*> detNodes;
+  TString nameTmp;
+
+  int nDetectors = topNode->GetNdaughters();
+  for (int i=0; i<nDetectors; i++){
+    detNodes.emplace_back(nullptr);
+  }
+  if (nDetectors < 1)
+    throw runtime_error(Form("ERROR: No detector nodes found in file %s", geoFile));
+  std::cout << Form("File %s: found %d daughters in the file.", geoFile, nDetectors) << std::endl;
+  int nDetFound = 0;
+  for (int i = 0; i < nDetectors; i++) {
+    nameTmp = topNode->GetDaughter(i)->GetName();
+    nameTmp.ToLower();
+    if (nameTmp.Contains(detectorTag)) {
+      detNodes.at(i) = topNode->GetDaughter(i);
+      nDetFound++;
+    }
+  }
+  std::cout << Form("File %s: found %d parts with the detector tag %s", geoFile, nDetFound, detectorTag) << std::endl;
+  
+  TVector3 frontFaceLocal, frontFaceGlobal;
+  int nModules;
+  TGeoMatrix *geoMatrix=nullptr;
+  for (int i=0; i<nDetectors; i++) {
+    if (!detNodes.at(i)) continue;
+    auto node = detNodes.at(i);
+    auto geoMatrix = node->GetMatrix();
+    auto geoBox = (TGeoBBox*) node->GetVolume()->GetShape();
+    frontFaceLocal.SetXYZ(0, 0, -geoBox->GetDZ());
+    geoMatrix->LocalToMaster(&frontFaceLocal[0], &frontFaceGlobal[0]);
+    printf("%s node name: %s\n", detectorTag, node->GetName());
+
+    int nMod = node->GetNdaughters();
+    int nModAdded = modulePosMap.size();
+    for (int iMod=0; iMod<nMod; iMod++) {
+      auto *daughter = node->GetDaughter(iMod);
+      auto geoMatrix = daughter->GetMatrix();
+      TVector3 translation(geoMatrix->GetTranslation());
+      int modId = daughter->GetNumber();
+      double x  = translation.X();
+      double y  = translation.Y();
+      translation.SetZ(frontFaceGlobal.Z());
+      double z  = translation.Z();
+      if (verbose) printf("\tModule %i, position: (%2.1f, %2.1f, %2.1f)\n", modId + nModAdded, x, y, z);
+      modulePosMap.insert({modId + nModAdded, {x,y,z}});
+    }
+  }
+  
+  fiGeo->Close();
+  nModules = modulePosMap.rbegin()->first;
+    vector <XYZVector> modulePosVector(nModules,{0.,0.,0.});
+  for(auto &modulePos:modulePosMap)
+    modulePosVector.at(modulePos.first-1)=modulePos.second;
+  if (verbose)
+  {
+    printf("%d module positions:\n", nModules);
+    for(int i=0;i<nModules;i++)
+      printf("%d: (%3.1f, %3.1f, %3.1f)\n", i, modulePosVector.at(i).x(), modulePosVector.at(i).y(), modulePosVector.at(i).z());
+  }
+  return modulePosVector;
+}
+
 RVec<float> fhcalModE(BmnFHCalEvent event)
 try {
   vector<float> fhcalModEnergy_;
@@ -696,6 +772,21 @@ try {
   for (int i = 0; i < 16; i++)
     hodoModCharge_.push_back(event.GetStrip(i+1)->GetSignal());
   return hodoModCharge_;
+} catch( const std::exception& e ){
+  std::cout << __func__ << std::endl;
+  throw e;
+}
+
+RVec<float> ndetModSig(BmnNdetEvent event)
+try{
+  vector<float> ndetModSignal_;
+  int nCells = (int)event.GetTotalCells();
+  for (int i = 0; i < nCells; i++){
+    auto cell = (BmnNdetCell*) event.GetCells().At(i);
+    if (!cell) ndetModSignal_.push_back(0.);
+    else ndetModSignal_.push_back(cell->GetSignal());
+  }
+  return ndetModSignal_;
 } catch( const std::exception& e ){
   std::cout << __func__ << std::endl;
   throw e;
@@ -804,7 +895,7 @@ void convertBmn_JAM(string inReco="data/run8/rec.root", std::string fileOut = "o
     cout << "||   Beam:          A = " << run_header->GetBeamA() << ", Z = " << run_header->GetBeamA() << "\t  ||" << endl;
     cout << "||   Beam energy:   " << run_header->GetBeamEnergy() << " GeV\t\t  ||" << endl;
     cout << "||   Target:        A = " << run_header->GetTargetA() << ", Z = " << run_header->GetTargetZ() << "\t  ||" << endl;
-    cout << "||   Field voltage: " << setprecision(4) << run_header->GetMagneticField() << " mV\t\t  ||" << endl;
+    // cout << "||   Field voltage: " << setprecision(4) << run_header->GetMagneticField() << " mV\t\t  ||" << endl;
     cout << "||\t\t\t\t\t  ||" << endl;
     cout << "||||||||||||||||||||||||||||||||||||||||||||\n" << endl;
   }
@@ -819,7 +910,11 @@ void convertBmn_JAM(string inReco="data/run8/rec.root", std::string fileOut = "o
   //   exit(-3);
   // }
 
-  std::string geoFileName{"/lustre/home/user/m/mmamaev/extendedBmnConverter/geometry/current_geo_file.root"};
+  std::string geoFilePath{"/lustre/home/user/p/parfenov/Soft/bmnroot_jul2024/geometry/"};
+  std::string geoFileName_ndet{"nDet_RNF_TWODET_44x44cm_121mods_4x4cm_with_rows_columns_NEW_NUMBERING_VETO_25mm_7slices_Cu_30mm_Sc_25mm_PCB_2mm_PLA_2mm_no_hole_ZdistDET_1_700cm_rotY_-10.0deg_rotX_-4.50deg_ZdistDET_2_700cm_rotY_-10.0deg_rotX_4.50deg.root"};
+  std::string geoFileName_fhcal{"FHCal_CBM_20mods_NICA_34mods_54mods_hole_Zpos_977.8cm_Xshift_65.30cm_Yshift-0.8cm_rotationY_4.2deg_v1.root"};
+  std::string geoFileName_scwall{"ScWall_with_hole_with_hole_in_box_cells_numbering_for_run8_Zpos_697.4cm_Xshift_65.65cm_Yshift-0.43cm_rotationY_0.0deg_v1.root"};
+  std::string geoFileName_hodo{"Hodo_with_box_Zpos_970.2cm_Xshift_64.90cm_Yshift_-1.0cm_rotationY_4.2deg_v1.root"};
   // get gGeoManager from ROOT file (if required)
   // TFile* geoFile = new TFile(geoFileName.c_str(), "READ");
   // if (!geoFile->IsOpen()) {
@@ -846,9 +941,10 @@ void convertBmn_JAM(string inReco="data/run8/rec.root", std::string fileOut = "o
   magField->SetScale(0.929);
   magField->Init();
 
-  auto scwallModPos=modulePos(geoFileName.c_str(),"scwall");
-  auto hodoModPos=modulePos(geoFileName.c_str(),"hodo");
-  auto fhcalModPos=modulePos(geoFileName.c_str(),"fhcal");
+  auto scwallModPos=modulePosDirect(std::string(geoFilePath+geoFileName_scwall).c_str(),"scwall");
+  auto hodoModPos=modulePosDirect(std::string(geoFilePath+geoFileName_hodo).c_str(),"hodo");
+  auto fhcalModPos=modulePosDirect(std::string(geoFilePath+geoFileName_fhcal).c_str(),"fhcal");
+  auto ndetModPos=modulePosDirect(std::string(geoFilePath+geoFileName_ndet).c_str(),"ndet");
   
   auto dd=d
   	.Define("psiRP","BmnMCInfo.fRotZ")
@@ -920,6 +1016,9 @@ void convertBmn_JAM(string inReco="data/run8/rec.root", std::string fileOut = "o
     .Define("fhcalModPos",[fhcalModPos](){return fhcalModPos;})
     .Define("fhcalModId", moduleId, {"fhcalModPos"})
     .Define("fhcalModE",fhcalModE,{"FHCalEvent"})
+    .Define("ndetModPos",[ndetModPos](){return ndetModPos;})
+    .Define("ndetModId", moduleId, {"ndetModPos"})
+    .Define("ndetModE",ndetModSig,{"NdetEvent"})
   ;
   // dd.Foreach([](uint evtId){if (evtId % 100 == 0) cout << "\r" << evtId;}, {"evtId"}); // progress display 
   cout << endl;
